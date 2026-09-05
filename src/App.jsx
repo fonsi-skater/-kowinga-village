@@ -22,8 +22,11 @@ import NarrationManager from './scenes/character/NarrationManager';
 import GardenInteraction from './scenes/character/GardenInteraction';
 import SpeedBoostManager from './scenes/character/SpeedBoostManager';
 import MeditationInteraction from './scenes/character/MeditationInteraction';
+import BushInteraction from './scenes/character/BushInteraction';
 import NarrationText from './components/ui/NarrationText';
 import ControlsHint from './components/ui/ControlsHint';
+import ActivityStatus from './components/ui/ActivityStatus';
+import ProgressTracker from './components/ui/ProgressTracker';
 
 function App() {
   // This ref is created HERE (not inside Character) and shared with both
@@ -99,12 +102,17 @@ function App() {
         {/* MeditationInteraction listens for E near the meditation platform
             to toggle isMeditating (read by Character to freeze movement). */}
         <MeditationInteraction targetRef={characterRef} />
+
+        {/* BushInteraction listens for E near an untended bush to tend it. */}
+        <BushInteraction targetRef={characterRef} />
       </Canvas>
 
       {/* NarrationText is plain HTML, deliberately OUTSIDE the Canvas —
           it reads the same shared store that NarrationManager writes to. */}
       <NarrationText />
       <ControlsHint />
+      <ActivityStatus />
+      <ProgressTracker />
     </div>
   );
 }

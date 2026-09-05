@@ -6,7 +6,10 @@
 
 import { RigidBody } from '@react-three/rapier';
 
-export const MEDITATION_SPOT_POSITION = [16, 0, -10];
+// Position moved to x=20 (was x=16) after an audit found the platform's
+// edge overlapped the river's sensor collider box at the old position —
+// that would have let standing on the platform also trigger isSwimming.
+export const MEDITATION_SPOT_POSITION = [20, 0, -10];
 
 function BigTree() {
   return (

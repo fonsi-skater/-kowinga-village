@@ -4,6 +4,8 @@
 // since this represents untended nature Fonsi "takes care of" rather than
 // cultivated rows. Positions are slightly randomized for a natural feel.
 
+import { useGameStore } from '../../state/useGameStore';
+
 export const BUSH_AREA_CENTER = [-10, 0, -14];
 
 // Fixed pseudo-random offsets (not Math.random(), so the layout is stable
@@ -19,11 +21,30 @@ const BUSH_OFFSETS = [
   [0.2, 0, -2.1],
 ];
 
-function Bush({ position, scale }) {
+// Absolute world positions, exported so BushInteraction can check distance
+// to each bush without duplicating this offset math — same pattern as
+// Garden's PLOT_POSITIONS.
+export const BUSH_POSITIONS = BUSH_OFFSETS.map(([x, _y, z]) => [
+  BUSH_AREA_CENTER[0] + x,
+  BUSH_AREA_CENTER[1],
+  BUSH_AREA_CENTER[2] + z,
+]);
+
+function Bush({ position, scale, index }) {
+  // "Tended" bushes (trimmed/cared for by Fonsi) turn a brighter, tidier
+  // green and shrink slightly — a small but visible sign of care, same
+  // spirit as a planted garden plot changing color.
+  const isTended = useGameStore((state) => state.tendedBushes.has(index));
+
   return (
-    <mesh position={position} scale={scale} castShadow receiveShadow>
+    <mesh
+      position={position}
+      scale={isTended ? scale * 0.85 : scale}
+      castShadow
+      receiveShadow
+    >
       <sphereGeometry args={[0.7, 8, 8]} />
-      <meshStandardMaterial color="#4a6b2f" />
+      <meshStandardMaterial color={isTended ? '#6fa84a' : '#4a6b2f'} />
     </mesh>
   );
 }
@@ -31,9 +52,10 @@ function Bush({ position, scale }) {
 export default function BushArea() {
   return (
     <group position={BUSH_AREA_CENTER}>
-      {BUSH_OFFSETS.map(([x, y, z], i) => (
+      {BUSH_OFFSETS.map(([x, _y, z], i) => (
         <Bush
           key={`bush-${i}`}
+          index={i}
           position={[x, 0.5, z]}
           // Slight scale variation per bush for a less uniform, wilder look
           scale={0.8 + (i % 3) * 0.2}
