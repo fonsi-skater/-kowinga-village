@@ -11,6 +11,7 @@
 import { useFrame } from '@react-three/fiber';
 import { useGameStore } from '../../state/useGameStore';
 import { NARRATION_LINES } from '../../story/narrationLines';
+import { playNarrationAudio } from '../../audio/narration/playNarrationAudio';
 
 import { RIVER_POSITION } from '../environment/River';
 import { SKATING_PATH_CENTER } from '../environment/SkatingPath';
@@ -51,6 +52,7 @@ export default function NarrationManager({ targetRef }) {
       if (distance <= TRIGGER_RADIUS) {
         markZonePlayed(zoneKey);
         setActiveNarration(NARRATION_LINES[zoneKey]);
+        playNarrationAudio(zoneKey);
         // Auto-hide after NARRATION_DURATION — setTimeout is fine here
         // since this fires rarely (once per zone per session), not every frame.
         setTimeout(() => setActiveNarration(null), NARRATION_DURATION);

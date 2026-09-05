@@ -9,6 +9,8 @@ import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import { useGameStore } from './state/useGameStore';
 import { INTRO_NARRATION } from './story/narrationLines';
+import { useAmbientMusic } from './audio/music/useAmbientMusic';
+import { playNarrationAudio } from './audio/narration/playNarrationAudio';
 import Ground from './scenes/environment/Ground';
 import River from './scenes/environment/River';
 import SkatingPath from './scenes/environment/SkatingPath';
@@ -27,6 +29,10 @@ import NarrationText from './components/ui/NarrationText';
 import ControlsHint from './components/ui/ControlsHint';
 import ActivityStatus from './components/ui/ActivityStatus';
 import ProgressTracker from './components/ui/ProgressTracker';
+import PortfolioNav from './components/ui/PortfolioNav';
+import PortfolioPanel from './components/ui/PortfolioPanel';
+import SiteTitle from './components/ui/SiteTitle';
+import HobbiesPanel from './components/ui/HobbiesPanel';
 
 function App() {
   // This ref is created HERE (not inside Character) and shared with both
@@ -36,13 +42,28 @@ function App() {
   const characterRef = useRef();
   const setActiveNarration = useGameStore((state) => state.setActiveNarration);
 
+  // Starts ambient background music (once a real file exists at
+  // public/audio/music/ambient.mp3) — internally waits for the player's
+  // first keypress due to browser autoplay restrictions.
+  useAmbientMusic();
+
   // Show the intro narration once, on first load — doesn't depend on
   // Fonsi's position like the zone narrations do, so it's a simple
   // effect that runs once when the component mounts.
   useEffect(() => {
     setActiveNarration(INTRO_NARRATION);
     const timer = setTimeout(() => setActiveNarration(null), 7000);
-    return () => clearTimeout(timer);
+
+    // Intro VOICE audio (not just text) is also blocked by the same
+    // autoplay restriction as music, since this runs before any user
+    // interaction — so we gate it behind the first keydown too.
+    const playIntroAudio = () => playNarrationAudio('intro');
+    window.addEventListener('keydown', playIntroAudio, { once: true });
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('keydown', playIntroAudio);
+    };
   }, [setActiveNarration]);
 
   return (
@@ -113,6 +134,10 @@ function App() {
       <ControlsHint />
       <ActivityStatus />
       <ProgressTracker />
+      <PortfolioNav />
+      <PortfolioPanel />
+      <SiteTitle />
+      <HobbiesPanel />
     </div>
   );
 }

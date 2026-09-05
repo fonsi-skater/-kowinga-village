@@ -72,6 +72,11 @@ export const useGameStore = create(
 
       // Tracks which bush INDEXES Fonsi has tended/trimmed — same pattern as
       // plantedPlots. A bush is either wild or tended, no in-between.
+      // Which portfolio UI panel is currently open (null, 'about',
+      // 'projects', or 'contact') — a pure UI concern, not persisted.
+      activePanel: null,
+      setActivePanel: (panel) => set({ activePanel: panel }),
+
       tendedBushes: new Set(),
       tendBush: (index) => {
         const updated = new Set(get().tendedBushes);
