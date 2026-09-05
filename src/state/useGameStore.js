@@ -10,6 +10,17 @@ export const useGameStore = create((set, get) => ({
   isSwimming: false,
   setIsSwimming: (value) => set({ isSwimming: value }),
 
+  // True while Fonsi is on the skating path ring — used to give a speed
+  // boost, similar in spirit to isSwimming's speed penalty.
+  isSkating: false,
+  setIsSkating: (value) => set({ isSkating: value }),
+
+  // True while Fonsi is sitting still at the meditation spot (toggled by
+  // pressing E there, not by proximity alone — meditation is a deliberate
+  // choice, not something that "just happens" by walking near a tree).
+  isMeditating: false,
+  setIsMeditating: (value) => set({ isMeditating: value }),
+
   // Currently displayed narration line, or null if nothing should show.
   activeNarration: null,
   setActiveNarration: (text) => set({ activeNarration: text }),

@@ -20,7 +20,7 @@ export default function ControlsHint() {
     >
       WASD / Arrows — move
       <br />
-      E — plant (near garden)
+      E — plant (garden) / sit (meditation spot)
     </div>
   );
 }

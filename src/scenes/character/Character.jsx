@@ -13,6 +13,7 @@ import { RIVER_SURFACE_Y } from '../environment/River';
 const MOVE_SPEED = 4; // units per second, on land
 const SWIM_SPEED = 2; // slower — water should feel heavier than walking
 const SWIM_RISE_SPEED = 3; // how quickly Fonsi rises/settles toward the water surface
+const SKATE_SPEED = 7; // faster — the whole point of the skating path
 
 // Note: bodyRef is now passed IN from App.jsx (instead of created here)
 // so the FollowCamera can read Fonsi's position too — both components
@@ -20,11 +21,22 @@ const SWIM_RISE_SPEED = 3; // how quickly Fonsi rises/settles toward the water s
 export default function Character({ bodyRef }) {
   const movement = useKeyboardControls();
   const isSwimming = useGameStore((state) => state.isSwimming);
+  const isSkating = useGameStore((state) => state.isSkating);
+  const isMeditating = useGameStore((state) => state.isMeditating);
 
   // useFrame runs on every rendered frame (usually ~60 times/sec).
   // This is where we read current key state and push the character body.
   useFrame((state, delta) => {
     if (!bodyRef.current) return;
+
+    // While meditating, Fonsi is deliberately still — ignore all movement
+    // input entirely and let him settle to a stop (except gravity, so he
+    // doesn't float if meditating mid-air somehow).
+    if (isMeditating) {
+      const currentVel = bodyRef.current.linvel();
+      bodyRef.current.setLinvel({ x: 0, y: currentVel.y, z: 0 }, true);
+      return;
+    }
 
     const { forward, backward, left, right } = movement.current;
 
@@ -36,7 +48,13 @@ export default function Character({ bodyRef }) {
     if (left) x -= 1;
     if (right) x += 1;
 
-    const speed = isSwimming ? SWIM_SPEED : MOVE_SPEED;
+    // Priority: swimming and skating shouldn't both apply at once in this
+    // simple version (the zones don't overlap anyway) — swimming checked
+    // first since entering water is the more "overriding" state.
+    let speed = MOVE_SPEED;
+    if (isSwimming) speed = SWIM_SPEED;
+    else if (isSkating) speed = SKATE_SPEED;
+
     const currentVel = bodyRef.current.linvel();
     const currentPos = bodyRef.current.translation();
 

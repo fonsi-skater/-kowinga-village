@@ -20,6 +20,8 @@ import Character from './scenes/character/Character';
 import FollowCamera from './scenes/character/FollowCamera';
 import NarrationManager from './scenes/character/NarrationManager';
 import GardenInteraction from './scenes/character/GardenInteraction';
+import SpeedBoostManager from './scenes/character/SpeedBoostManager';
+import MeditationInteraction from './scenes/character/MeditationInteraction';
 import NarrationText from './components/ui/NarrationText';
 import ControlsHint from './components/ui/ControlsHint';
 
@@ -89,6 +91,14 @@ function App() {
         {/* GardenInteraction listens for the E key and plants the nearest
             garden plot if Fonsi is close enough — see the file for details. */}
         <GardenInteraction targetRef={characterRef} />
+
+        {/* SpeedBoostManager checks if Fonsi is on the skating path ring
+            and toggles isSkating (read by Character for the speed boost). */}
+        <SpeedBoostManager targetRef={characterRef} />
+
+        {/* MeditationInteraction listens for E near the meditation platform
+            to toggle isMeditating (read by Character to freeze movement). */}
+        <MeditationInteraction targetRef={characterRef} />
       </Canvas>
 
       {/* NarrationText is plain HTML, deliberately OUTSIDE the Canvas —
