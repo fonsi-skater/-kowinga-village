@@ -17,6 +17,7 @@ export default function NarrationText() {
         left: '50%',
         transform: 'translateX(-50%)',
         maxWidth: '600px',
+        width: '85%',
         textAlign: 'center',
         color: 'white',
         fontFamily: 'Georgia, serif',

@@ -6,16 +6,20 @@
 import { useGameStore } from '../../state/useGameStore';
 import { PLOT_POSITIONS } from '../../scenes/environment/Garden';
 import { BUSH_POSITIONS } from '../../scenes/environment/BushArea';
+import { useIsTouchDevice } from '../../hooks/useIsTouchDevice';
 
 export default function ProgressTracker() {
   const plantedCount = useGameStore((state) => state.plantedPlots.size);
   const tendedCount = useGameStore((state) => state.tendedBushes.size);
+  const isTouchDevice = useIsTouchDevice();
 
   return (
     <div
       style={{
         position: 'absolute',
-        bottom: '16px',
+        // On touch devices, the joystick occupies bottom-left, so this
+        // moves up out of the way instead of overlapping it.
+        bottom: isTouchDevice ? '150px' : '16px',
         left: '16px',
         color: 'white',
         fontFamily: 'sans-serif',

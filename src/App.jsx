@@ -36,8 +36,12 @@ import SiteTitle from './components/ui/SiteTitle';
 import HobbiesPanel from './components/ui/HobbiesPanel';
 import ZoneLegend from './components/ui/ZoneLegend';
 import IntroScreen from './components/ui/IntroScreen';
+import TouchJoystick from './components/ui/TouchJoystick';
+import TouchInteractButton from './components/ui/TouchInteractButton';
+import { useIsTouchDevice } from './hooks/useIsTouchDevice';
 
 function App() {
+  const isTouchDevice = useIsTouchDevice();
   // This ref is created HERE (not inside Character) and shared with both
   // Character (which moves the body) and FollowCamera (which reads its
   // position) — this is the standard React pattern for "two siblings need
@@ -143,6 +147,15 @@ function App() {
       <HobbiesPanel />
       <ZoneLegend />
       <IntroScreen />
+
+      {/* Touch controls only render on touch devices — desktop users keep
+          using WASD/E, so nothing changes for them. */}
+      {isTouchDevice && (
+        <>
+          <TouchJoystick />
+          <TouchInteractButton />
+        </>
+      )}
     </div>
   );
 }

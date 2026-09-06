@@ -5,6 +5,7 @@
 // NarrationText (bottom-center) or the existing HUD elements.
 
 import { useGameStore } from '../../state/useGameStore';
+import { useIsTouchDevice } from '../../hooks/useIsTouchDevice';
 
 const buttonStyle = {
   background: 'rgba(0,0,0,0.55)',
@@ -20,14 +21,20 @@ const buttonStyle = {
 
 export default function PortfolioNav() {
   const setActivePanel = useGameStore((state) => state.setActivePanel);
+  const isTouchDevice = useIsTouchDevice();
 
   return (
     <div
       style={{
         position: 'absolute',
-        bottom: '16px',
+        // On touch devices, the interact button occupies bottom-right,
+        // so this moves up out of the way instead of overlapping it.
+        bottom: isTouchDevice ? '150px' : '16px',
         right: '16px',
         display: 'flex',
+        // Stack vertically on touch/narrow screens — three buttons side
+        // by side get cramped on a phone-width viewport.
+        flexDirection: isTouchDevice ? 'column' : 'row',
         gap: '8px',
         pointerEvents: 'none', // container itself doesn't block canvas drags
       }}
