@@ -74,6 +74,18 @@ export const useGameStore = create(
       // plantedPlots. A bush is either wild or tended, no in-between.
       // Which portfolio UI panel is currently open (null, 'about',
       // 'projects', or 'contact') — a pure UI concern, not persisted.
+      // Which zone Fonsi is currently standing in, or null if he's on
+      // open ground between zones — drives the "you are here" label.
+      // Controls the full intro splash screen shown before entering the
+      // village — starts true (shown by default), dismissed once via the
+      // "Enter Kowinga" button. Deliberately NOT persisted (not in
+      // partialize below) so it shows again on every fresh visit.
+      showIntroScreen: true,
+      setShowIntroScreen: (value) => set({ showIntroScreen: value }),
+
+      currentZone: null,
+      setCurrentZone: (zone) => set({ currentZone: zone }),
+
       activePanel: null,
       setActivePanel: (panel) => set({ activePanel: panel }),
 

@@ -12,26 +12,10 @@ import { useFrame } from '@react-three/fiber';
 import { useGameStore } from '../../state/useGameStore';
 import { NARRATION_LINES } from '../../story/narrationLines';
 import { playNarrationAudio } from '../../audio/narration/playNarrationAudio';
-
-import { RIVER_POSITION } from '../environment/River';
-import { SKATING_PATH_CENTER } from '../environment/SkatingPath';
-import { HOMESTEAD_CENTER } from '../environment/Homestead';
-import { GARDEN_CENTER } from '../environment/Garden';
-import { MEDITATION_SPOT_POSITION } from '../environment/MeditationSpot';
-import { BUSH_AREA_CENTER } from '../environment/BushArea';
+import { ZONE_POSITIONS } from '../../story/zonePositions';
 
 const TRIGGER_RADIUS = 6; // how close Fonsi must get, in world units
 const NARRATION_DURATION = 6000; // milliseconds the text stays visible
-
-// Mapping zone key -> [x, y, z] center. Keys must match NARRATION_LINES.
-const ZONES = {
-  river: RIVER_POSITION,
-  skatingPath: SKATING_PATH_CENTER,
-  homestead: HOMESTEAD_CENTER,
-  garden: GARDEN_CENTER,
-  meditationSpot: MEDITATION_SPOT_POSITION,
-  bushArea: BUSH_AREA_CENTER,
-};
 
 export default function NarrationManager({ targetRef }) {
   const playedZones = useGameStore((state) => state.playedZones);
@@ -42,7 +26,7 @@ export default function NarrationManager({ targetRef }) {
     if (!targetRef.current) return;
     const pos = targetRef.current.translation();
 
-    for (const [zoneKey, center] of Object.entries(ZONES)) {
+    for (const [zoneKey, center] of Object.entries(ZONE_POSITIONS)) {
       if (playedZones.has(zoneKey)) continue; // already shown, skip
 
       const dx = pos.x - center[0];

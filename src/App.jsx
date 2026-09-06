@@ -25,6 +25,7 @@ import GardenInteraction from './scenes/character/GardenInteraction';
 import SpeedBoostManager from './scenes/character/SpeedBoostManager';
 import MeditationInteraction from './scenes/character/MeditationInteraction';
 import BushInteraction from './scenes/character/BushInteraction';
+import ZoneFloatingLabels from './components/ui/ZoneFloatingLabels';
 import NarrationText from './components/ui/NarrationText';
 import ControlsHint from './components/ui/ControlsHint';
 import ActivityStatus from './components/ui/ActivityStatus';
@@ -33,6 +34,8 @@ import PortfolioNav from './components/ui/PortfolioNav';
 import PortfolioPanel from './components/ui/PortfolioPanel';
 import SiteTitle from './components/ui/SiteTitle';
 import HobbiesPanel from './components/ui/HobbiesPanel';
+import ZoneLegend from './components/ui/ZoneLegend';
+import IntroScreen from './components/ui/IntroScreen';
 
 function App() {
   // This ref is created HERE (not inside Character) and shared with both
@@ -41,30 +44,24 @@ function App() {
   // access to the same thing": lift the shared value up to their parent.
   const characterRef = useRef();
   const setActiveNarration = useGameStore((state) => state.setActiveNarration);
+  const showIntroScreen = useGameStore((state) => state.showIntroScreen);
 
-  // Starts ambient background music (once a real file exists at
-  // public/audio/music/ambient.mp3) — internally waits for the player's
-  // first keypress due to browser autoplay restrictions.
-  useAmbientMusic();
+  // Starts ambient background music once the intro screen is dismissed —
+  // clicking "Enter Kowinga" is a real user interaction, which is exactly
+  // what browsers require before allowing audio to play at all.
+  useAmbientMusic(!showIntroScreen);
 
-  // Show the intro narration once, on first load — doesn't depend on
-  // Fonsi's position like the zone narrations do, so it's a simple
-  // effect that runs once when the component mounts.
+  // Show the intro narration TEXT once the intro screen is dismissed
+  // (not on raw mount — the splash screen itself now covers that moment).
   useEffect(() => {
+    if (showIntroScreen) return; // wait until the player has clicked Enter
+
     setActiveNarration(INTRO_NARRATION);
     const timer = setTimeout(() => setActiveNarration(null), 7000);
+    playNarrationAudio('intro'); // safe now — this runs AFTER the Enter click
 
-    // Intro VOICE audio (not just text) is also blocked by the same
-    // autoplay restriction as music, since this runs before any user
-    // interaction — so we gate it behind the first keydown too.
-    const playIntroAudio = () => playNarrationAudio('intro');
-    window.addEventListener('keydown', playIntroAudio, { once: true });
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('keydown', playIntroAudio);
-    };
-  }, [setActiveNarration]);
+    return () => clearTimeout(timer);
+  }, [showIntroScreen, setActiveNarration]);
 
   return (
     // Wrapper div with position: relative so NarrationText (position:
@@ -126,6 +123,12 @@ function App() {
 
         {/* BushInteraction listens for E near an untended bush to tend it. */}
         <BushInteraction targetRef={characterRef} />
+
+        {/* ZoneFloatingLabels renders each zone's name anchored to its
+            actual 3D position — appears naturally beside/above wherever
+            that zone is on screen, never competing with fixed-position
+            UI like SiteTitle. */}
+        <ZoneFloatingLabels />
       </Canvas>
 
       {/* NarrationText is plain HTML, deliberately OUTSIDE the Canvas —
@@ -138,6 +141,8 @@ function App() {
       <PortfolioPanel />
       <SiteTitle />
       <HobbiesPanel />
+      <ZoneLegend />
+      <IntroScreen />
     </div>
   );
 }

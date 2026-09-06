@@ -7,9 +7,16 @@
 import { useEffect, useRef } from 'react';
 import { Howl } from 'howler';
 
-export function useAmbientMusic() {
+// `trigger` is a boolean that flips true once the user has done something
+// that counts as a browser-required interaction (here: clicking "Enter
+// Kowinga" on the intro screen). Music only starts once trigger becomes
+// true — before that, calling .play() would be silently blocked anyway
+// by the browser's autoplay policy, so we wait for a real signal instead
+// of guessing when input might happen.
+export function useAmbientMusic(trigger) {
   const soundRef = useRef(null);
 
+  // Create the Howl instance once, on mount.
   useEffect(() => {
     soundRef.current = new Howl({
       src: ['/audio/music/ambient.mp3'],
@@ -22,20 +29,15 @@ export function useAmbientMusic() {
       },
     });
 
-    // IMPORTANT: browsers block audio from autoplaying before the user has
-    // interacted with the page at all (click, keypress, etc.) — this is a
-    // browser policy, not a bug in our code. So instead of calling .play()
-    // immediately on mount, we wait for the first keydown (which will
-    // naturally happen the moment the player presses WASD to move) and
-    // start music then. { once: true } removes the listener after it fires.
-    const startOnFirstInput = () => {
-      soundRef.current?.play();
-    };
-    window.addEventListener('keydown', startOnFirstInput, { once: true });
-
     return () => {
-      window.removeEventListener('keydown', startOnFirstInput);
       soundRef.current?.unload();
     };
   }, []);
+
+  // Separate effect: whenever `trigger` flips to true, start playback.
+  useEffect(() => {
+    if (trigger) {
+      soundRef.current?.play();
+    }
+  }, [trigger]);
 }
