@@ -8,6 +8,7 @@
 import { useGameStore } from '../../state/useGameStore';
 import { useInteractKey } from '../../hooks/useInteractKey';
 import { MEDITATION_SPOT_POSITION } from '../environment/MeditationSpot';
+import { playSfx } from '../../audio/sfx/playSfx';
 
 const INTERACT_RADIUS = 3;
 
@@ -25,6 +26,7 @@ export default function MeditationInteraction({ targetRef }) {
 
     if (distance <= INTERACT_RADIUS) {
       setIsMeditating(!isMeditating);
+      playSfx('meditation-chime');
     }
   });
 

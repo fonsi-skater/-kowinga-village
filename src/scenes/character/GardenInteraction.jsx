@@ -7,6 +7,7 @@
 import { useGameStore } from '../../state/useGameStore';
 import { useInteractKey } from '../../hooks/useInteractKey';
 import { PLOT_POSITIONS } from '../environment/Garden';
+import { playSfx } from '../../audio/sfx/playSfx';
 
 const INTERACT_RADIUS = 2.5; // how close Fonsi must be to a plot to plant it
 
@@ -37,6 +38,7 @@ export default function GardenInteraction({ targetRef }) {
 
     if (closestIndex !== -1) {
       plantPlot(closestIndex);
+      playSfx('plant-rustle');
     }
   });
 

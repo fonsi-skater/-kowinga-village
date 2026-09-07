@@ -83,6 +83,28 @@ export const useGameStore = create(
       showIntroScreen: true,
       setShowIntroScreen: (value) => set({ showIntroScreen: value }),
 
+      // Fonsi's current world x/z position, updated live each frame by
+      // MiniMapManager — used only to draw his dot on the mini-map.
+      fonsiMapPosition: { x: 0, z: 0 },
+      setFonsiMapPosition: (pos) => set({ fonsiMapPosition: pos }),
+
+      // Prevents the "Village Explorer" celebration from showing more
+      // than once per session, even though the completion conditions
+      // remain true after the first time they're met.
+      hasCelebrated: false,
+      setHasCelebrated: (value) => set({ hasCelebrated: value }),
+
+      // True once the hidden secret spot has been discovered — drives the
+      // one-time EasterEggMessage popup.
+      foundEasterEgg: false,
+      setFoundEasterEgg: (value) => set({ foundEasterEgg: value }),
+
+      // Separate from foundEasterEgg (which stays true forever once found)
+      // — this transient flag controls whether the popup message is
+      // CURRENTLY visible, auto-cleared a few seconds after being found.
+      showEasterEggMessage: false,
+      setShowEasterEggMessage: (value) => set({ showEasterEggMessage: value }),
+
       currentZone: null,
       setCurrentZone: (zone) => set({ currentZone: zone }),
 

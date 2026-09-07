@@ -6,6 +6,7 @@
 
 import { useFrame } from '@react-three/fiber';
 import { useGameStore } from '../../state/useGameStore';
+import { playSfx } from '../../audio/sfx/playSfx';
 import {
   SKATING_PATH_CENTER,
   SKATING_PATH_RADIUS,
@@ -32,6 +33,7 @@ export default function SpeedBoostManager({ targetRef }) {
     const currentValue = useGameStore.getState().isSkating;
     if (onPath !== currentValue) {
       useGameStore.getState().setIsSkating(onPath);
+      if (onPath) playSfx('skate-whoosh'); // only on entering, not leaving
     }
   });
 

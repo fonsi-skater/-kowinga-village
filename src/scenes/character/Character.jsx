@@ -26,7 +26,7 @@ export default function Character({ bodyRef }) {
 
   // useFrame runs on every rendered frame (usually ~60 times/sec).
   // This is where we read current key state and push the character body.
-  useFrame((state, delta) => {
+  useFrame(() => {
     if (!bodyRef.current) return;
 
     // While meditating, Fonsi is deliberately still — ignore all movement

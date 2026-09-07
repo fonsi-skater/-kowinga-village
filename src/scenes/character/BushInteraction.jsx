@@ -6,6 +6,7 @@
 import { useGameStore } from '../../state/useGameStore';
 import { useInteractKey } from '../../hooks/useInteractKey';
 import { BUSH_POSITIONS } from '../environment/BushArea';
+import { playSfx } from '../../audio/sfx/playSfx';
 
 const INTERACT_RADIUS = 2.5;
 
@@ -35,6 +36,7 @@ export default function BushInteraction({ targetRef }) {
 
     if (closestIndex !== -1) {
       tendBush(closestIndex);
+      playSfx('bush-tend');
     }
   });
 

@@ -8,12 +8,13 @@
 // which is what we want for swimming (he should be able to go IN the water,
 // not collide with it like a wall).
 
-import { useRef, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Water } from 'three/addons/objects/Water.js';
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
 import { useGameStore } from '../../state/useGameStore';
+import { playSfx } from '../../audio/sfx/playSfx';
 
 // Position and size are exported so other files (like a future "zones" map
 // or minimap) can reference the same values instead of duplicating numbers.
@@ -85,7 +86,10 @@ export default function River() {
         args={[RIVER_SIZE[0] / 2, 0.5, RIVER_SIZE[1] / 2]}
         position={RIVER_POSITION}
         sensor
-        onIntersectionEnter={() => setIsSwimming(true)}
+        onIntersectionEnter={() => {
+          setIsSwimming(true);
+          playSfx('splash');
+        }}
         onIntersectionExit={() => setIsSwimming(false)}
       />
       <WaterSurface />

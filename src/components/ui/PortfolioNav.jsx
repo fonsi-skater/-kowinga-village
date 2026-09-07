@@ -6,6 +6,7 @@
 
 import { useGameStore } from '../../state/useGameStore';
 import { useIsTouchDevice } from '../../hooks/useIsTouchDevice';
+import ScreenshotButton from './ScreenshotButton';
 
 const buttonStyle = {
   background: 'rgba(0,0,0,0.55)',
@@ -48,6 +49,7 @@ export default function PortfolioNav() {
       <button style={buttonStyle} onClick={() => setActivePanel('contact')}>
         Contact
       </button>
+      <ScreenshotButton />
     </div>
   );
 }

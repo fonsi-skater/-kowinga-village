@@ -26,6 +26,9 @@ import SpeedBoostManager from './scenes/character/SpeedBoostManager';
 import MeditationInteraction from './scenes/character/MeditationInteraction';
 import BushInteraction from './scenes/character/BushInteraction';
 import ZoneFloatingLabels from './components/ui/ZoneFloatingLabels';
+import DayNightCycle from './scenes/environment/DayNightCycle';
+import MiniMapManager from './scenes/character/MiniMapManager';
+import EasterEggManager from './scenes/character/EasterEggManager';
 import NarrationText from './components/ui/NarrationText';
 import ControlsHint from './components/ui/ControlsHint';
 import ActivityStatus from './components/ui/ActivityStatus';
@@ -38,10 +41,18 @@ import ZoneLegend from './components/ui/ZoneLegend';
 import IntroScreen from './components/ui/IntroScreen';
 import TouchJoystick from './components/ui/TouchJoystick';
 import TouchInteractButton from './components/ui/TouchInteractButton';
+import MiniMap from './components/ui/MiniMap';
+import VillageExplorerCelebration from './components/ui/VillageExplorerCelebration';
+import EasterEggMessage from './components/ui/EasterEggMessage';
 import { useIsTouchDevice } from './hooks/useIsTouchDevice';
 
 function App() {
   const isTouchDevice = useIsTouchDevice();
+  // Refs for the day/night cycle to animate — created here since the
+  // lights themselves are declared in JSX below, and DayNightCycle needs
+  // direct references to update their .intensity each frame.
+  const ambientLightRef = useRef();
+  const directionalLightRef = useRef();
   // This ref is created HERE (not inside Character) and shared with both
   // Character (which moves the body) and FollowCamera (which reads its
   // position) — this is the standard React pattern for "two siblings need
@@ -77,16 +88,26 @@ function App() {
         shadows
         camera={{ position: [0, 5, 10], fov: 50 }}
         style={{ width: '100%', height: '100%', background: '#87ceeb' }}
+        // preserveDrawingBuffer is required for ScreenshotButton's
+        // canvas.toDataURL() to work — without it, WebGL clears its
+        // buffer right after each frame renders, so a screenshot taken
+        // any time after that would just capture a blank image.
+        gl={{ preserveDrawingBuffer: true }}
       >
         {/* Ambient light: soft light from all directions, prevents pure-black shadows */}
-        <ambientLight intensity={0.6} />
+        <ambientLight ref={ambientLightRef} intensity={0.6} />
 
         {/* Directional light: acts like the sun, casts shadows */}
         <directionalLight
+          ref={directionalLightRef}
           position={[10, 10, 5]}
           intensity={1}
           castShadow
         />
+
+        {/* Animates sky color and light intensities through a repeating
+            day/night cycle — purely atmospheric, no new 3D objects. */}
+        <DayNightCycle ambientRef={ambientLightRef} directionalRef={directionalLightRef} />
 
         {/* Physics provider: everything that needs collision/gravity (Ground,
             Character) must live inside this. Nothing outside it is physics-aware.
@@ -133,6 +154,12 @@ function App() {
             that zone is on screen, never competing with fixed-position
             UI like SiteTitle. */}
         <ZoneFloatingLabels />
+
+        {/* MiniMapManager tracks Fonsi's live position for the MiniMap UI. */}
+        <MiniMapManager targetRef={characterRef} />
+
+        {/* EasterEggManager watches for the hidden secret spot being found. */}
+        <EasterEggManager targetRef={characterRef} />
       </Canvas>
 
       {/* NarrationText is plain HTML, deliberately OUTSIDE the Canvas —
@@ -147,6 +174,9 @@ function App() {
       <HobbiesPanel />
       <ZoneLegend />
       <IntroScreen />
+      <MiniMap />
+      <VillageExplorerCelebration />
+      <EasterEggMessage />
 
       {/* Touch controls only render on touch devices — desktop users keep
           using WASD/E, so nothing changes for them. */}
