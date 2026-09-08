@@ -1,15 +1,19 @@
 // zonePositions.js
 // Central mapping of zoneKey -> [x, y, z] world position, shared by
 // anything that needs to check Fonsi's distance to a named zone
-// (NarrationManager, ZoneLabelManager). Keeping this in ONE place means
-// the six zone positions never drift out of sync between features.
+// (NarrationManager, ZoneLabelManager). Sources everything from
+// zoneData.js — a plain data file with no heavy imports — rather than
+// from the component files directly, so this stays safely importable
+// from eager (non-lazy) UI code without dragging in Rapier/Three.js.
 
-import { RIVER_POSITION } from '../scenes/environment/River';
-import { SKATING_PATH_CENTER } from '../scenes/environment/SkatingPath';
-import { HOMESTEAD_CENTER } from '../scenes/environment/Homestead';
-import { GARDEN_CENTER } from '../scenes/environment/Garden';
-import { MEDITATION_SPOT_POSITION } from '../scenes/environment/MeditationSpot';
-import { BUSH_AREA_CENTER } from '../scenes/environment/BushArea';
+import {
+  RIVER_POSITION,
+  SKATING_PATH_CENTER,
+  HOMESTEAD_CENTER,
+  GARDEN_CENTER,
+  MEDITATION_SPOT_POSITION,
+  BUSH_AREA_CENTER,
+} from './zoneData';
 
 export const ZONE_POSITIONS = {
   river: RIVER_POSITION,

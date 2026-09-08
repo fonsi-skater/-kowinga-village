@@ -5,7 +5,7 @@
 
 import { useGameStore } from '../../state/useGameStore';
 import { useInteractKey } from '../../hooks/useInteractKey';
-import { BUSH_POSITIONS } from '../environment/BushArea';
+import { BUSH_POSITIONS } from '../../story/zoneData';
 import { playSfx } from '../../audio/sfx/playSfx';
 
 const INTERACT_RADIUS = 2.5;
@@ -13,6 +13,7 @@ const INTERACT_RADIUS = 2.5;
 export default function BushInteraction({ targetRef }) {
   const tendedBushes = useGameStore((state) => state.tendedBushes);
   const tendBush = useGameStore((state) => state.tendBush);
+  const unlockAchievement = useGameStore((state) => state.unlockAchievement);
 
   useInteractKey(() => {
     if (!targetRef.current) return;
@@ -37,6 +38,7 @@ export default function BushInteraction({ targetRef }) {
     if (closestIndex !== -1) {
       tendBush(closestIndex);
       playSfx('bush-tend');
+      unlockAchievement('firstTend', '🌿 First bush tended!');
     }
   });
 

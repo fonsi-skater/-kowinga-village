@@ -4,11 +4,9 @@
 // lights and the background color. Runs on a repeating loop (not tied to
 // real-world time) so every visitor actually sees the cycle happen.
 
-import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-
-const CYCLE_DURATION = 120; // seconds for one full day/night loop
+import { getDaylightAmount } from './dayNightUtils';
 
 // Colors at the extremes of the cycle
 const NIGHT_SKY = new THREE.Color('#0a1128');
@@ -17,15 +15,9 @@ const tempColor = new THREE.Color(); // reused each frame to avoid allocating
 
 export default function DayNightCycle({ ambientRef, directionalRef }) {
   const { scene } = useThree();
-  const elapsed = useRef(0);
 
-  useFrame((state, delta) => {
-    elapsed.current += delta;
-    const t = (elapsed.current % CYCLE_DURATION) / CYCLE_DURATION; // 0..1
-
-    // Smooth 0 (deep night) -> 1 (full day) -> 0 curve using sine, peaking
-    // at the midpoint of the cycle instead of a linear/jarring transition.
-    const daylight = Math.sin(t * Math.PI * 2 - Math.PI / 2) * 0.5 + 0.5;
+  useFrame((state) => {
+    const daylight = getDaylightAmount(state.clock.elapsedTime);
 
     // Sky color: lerp between night and day based on daylight amount
     tempColor.lerpColors(NIGHT_SKY, DAY_SKY, daylight);

@@ -4,7 +4,7 @@
 // Projects (list with links), or Contact (email/phone/GitHub).
 
 import { useGameStore } from '../../state/useGameStore';
-import { ABOUT_CONTENT, PROJECTS_CONTENT, CONTACT_CONTENT } from '../../story/portfolioContent';
+import { ABOUT_CONTENT, PROJECTS_CONTENT, CONTACT_CONTENT, SKILLS_CONTENT } from '../../story/portfolioContent';
 
 const overlayStyle = {
   position: 'absolute',
@@ -81,6 +81,35 @@ function ProjectsPanelContent() {
   );
 }
 
+function SkillsPanelContent() {
+  return (
+    <>
+      <h2 style={{ marginTop: 0 }}>{SKILLS_CONTENT.title}</h2>
+      {SKILLS_CONTENT.categories.map((category, i) => (
+        <div key={i} style={{ marginBottom: '16px' }}>
+          <h3 style={{ marginBottom: '6px', fontSize: '0.95rem', opacity: 0.9 }}>{category.name}</h3>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {category.items.map((item, j) => (
+              <span
+                key={j}
+                style={{
+                  background: 'rgba(143,214,148,0.15)',
+                  border: '1px solid rgba(143,214,148,0.4)',
+                  borderRadius: '14px',
+                  padding: '4px 12px',
+                  fontSize: '0.85rem',
+                }}
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
 function ContactPanelContent() {
   return (
     <>
@@ -112,6 +141,7 @@ export default function PortfolioPanel() {
         <button style={closeButtonStyle} onClick={() => setActivePanel(null)}>✕</button>
         {activePanel === 'about' && <AboutPanelContent />}
         {activePanel === 'projects' && <ProjectsPanelContent />}
+        {activePanel === 'skills' && <SkillsPanelContent />}
         {activePanel === 'contact' && <ContactPanelContent />}
       </div>
     </div>

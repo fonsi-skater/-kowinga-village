@@ -11,7 +11,7 @@ import {
   SKATING_PATH_CENTER,
   SKATING_PATH_RADIUS,
   SKATING_PATH_WIDTH,
-} from '../environment/SkatingPath';
+} from '../../story/zoneData';
 
 const INNER_RADIUS = SKATING_PATH_RADIUS - SKATING_PATH_WIDTH / 2;
 const OUTER_RADIUS = SKATING_PATH_RADIUS + SKATING_PATH_WIDTH / 2;
@@ -33,7 +33,10 @@ export default function SpeedBoostManager({ targetRef }) {
     const currentValue = useGameStore.getState().isSkating;
     if (onPath !== currentValue) {
       useGameStore.getState().setIsSkating(onPath);
-      if (onPath) playSfx('skate-whoosh'); // only on entering, not leaving
+      if (onPath) {
+        playSfx('skate-whoosh'); // only on entering, not leaving
+        useGameStore.getState().unlockAchievement('firstSkate', '🛼 First skate!');
+      }
     }
   });
 

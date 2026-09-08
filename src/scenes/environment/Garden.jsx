@@ -4,29 +4,7 @@
 // track growth stages per plot as Fonsi "plants" and tends them.
 
 import { useGameStore } from '../../state/useGameStore';
-
-export const GARDEN_CENTER = [8, 0, -14];
-
-const PLOT_SIZE = [1.5, 0.3, 1.5]; // [width, height, depth]
-const GRID_ROWS = 3;
-const GRID_COLS = 3;
-const SPACING = 2; // distance between plot centers
-
-// Absolute world-space positions of every plot, computed once and exported
-// so other components (like an interaction manager) can check Fonsi's
-// distance to each one without duplicating this grid math.
-export const PLOT_POSITIONS = [];
-for (let row = 0; row < GRID_ROWS; row++) {
-  for (let col = 0; col < GRID_COLS; col++) {
-    const localX = (col - (GRID_COLS - 1) / 2) * SPACING;
-    const localZ = (row - (GRID_ROWS - 1) / 2) * SPACING;
-    PLOT_POSITIONS.push([
-      GARDEN_CENTER[0] + localX,
-      GARDEN_CENTER[1],
-      GARDEN_CENTER[2] + localZ,
-    ]);
-  }
-}
+import { GARDEN_CENTER, PLOT_POSITIONS, PLOT_SIZE } from '../../story/zoneData';
 
 function Plot({ position, index }) {
   // Reading planted state per-plot from the shared store — when Fonsi

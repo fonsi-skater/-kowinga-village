@@ -6,7 +6,7 @@
 
 import { useGameStore } from '../../state/useGameStore';
 import { useInteractKey } from '../../hooks/useInteractKey';
-import { PLOT_POSITIONS } from '../environment/Garden';
+import { PLOT_POSITIONS } from '../../story/zoneData';
 import { playSfx } from '../../audio/sfx/playSfx';
 
 const INTERACT_RADIUS = 2.5; // how close Fonsi must be to a plot to plant it
@@ -14,6 +14,7 @@ const INTERACT_RADIUS = 2.5; // how close Fonsi must be to a plot to plant it
 export default function GardenInteraction({ targetRef }) {
   const plantedPlots = useGameStore((state) => state.plantedPlots);
   const plantPlot = useGameStore((state) => state.plantPlot);
+  const unlockAchievement = useGameStore((state) => state.unlockAchievement);
 
   useInteractKey(() => {
     if (!targetRef.current) return;
@@ -39,6 +40,7 @@ export default function GardenInteraction({ targetRef }) {
     if (closestIndex !== -1) {
       plantPlot(closestIndex);
       playSfx('plant-rustle');
+      unlockAchievement('firstPlant', '🌱 First plant!');
     }
   });
 

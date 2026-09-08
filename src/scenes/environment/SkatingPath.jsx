@@ -5,10 +5,7 @@
 // body when something needs DIFFERENT behavior than plain ground (like
 // River's sensor, which detects "entering water").
 
-// Exported so other files (minimap, zone triggers later) can reuse this.
-export const SKATING_PATH_CENTER = [-10, 0.02, 0]; // slightly above ground, avoids z-fighting
-export const SKATING_PATH_RADIUS = 6;
-export const SKATING_PATH_WIDTH = 2;
+import { SKATING_PATH_CENTER, SKATING_PATH_RADIUS, SKATING_PATH_WIDTH } from '../../story/zoneData';
 
 export default function SkatingPath() {
   return (

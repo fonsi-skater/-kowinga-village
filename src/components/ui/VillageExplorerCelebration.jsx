@@ -6,8 +6,7 @@
 
 import { useEffect } from 'react';
 import { useGameStore } from '../../state/useGameStore';
-import { PLOT_POSITIONS } from '../../scenes/environment/Garden';
-import { BUSH_POSITIONS } from '../../scenes/environment/BushArea';
+import { PLOT_POSITIONS, BUSH_POSITIONS } from '../../story/zoneData';
 
 const TOTAL_ZONES = 6;
 

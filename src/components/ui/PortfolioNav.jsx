@@ -46,6 +46,9 @@ export default function PortfolioNav() {
       <button style={buttonStyle} onClick={() => setActivePanel('projects')}>
         Projects
       </button>
+      <button style={buttonStyle} onClick={() => setActivePanel('skills')}>
+        Skills
+      </button>
       <button style={buttonStyle} onClick={() => setActivePanel('contact')}>
         Contact
       </button>

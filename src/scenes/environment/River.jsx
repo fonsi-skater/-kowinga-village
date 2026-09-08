@@ -15,12 +15,7 @@ import { Water } from 'three/addons/objects/Water.js';
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
 import { useGameStore } from '../../state/useGameStore';
 import { playSfx } from '../../audio/sfx/playSfx';
-
-// Position and size are exported so other files (like a future "zones" map
-// or minimap) can reference the same values instead of duplicating numbers.
-export const RIVER_POSITION = [12, 0.01, 0]; // slightly above 0 to avoid z-fighting with ground
-export const RIVER_SIZE = [8, 20]; // [width, length]
-export const RIVER_SURFACE_Y = 0.3; // roughly where the "water line" sits
+import { RIVER_POSITION, RIVER_SIZE } from '../../story/zoneData';
 
 // Separate component for just the visual water surface — keeps the
 // Water-specific setup (texture loading, per-frame time update) isolated
@@ -71,6 +66,7 @@ function WaterSurface() {
 
 export default function River() {
   const setIsSwimming = useGameStore((state) => state.setIsSwimming);
+  const unlockAchievement = useGameStore((state) => state.unlockAchievement);
 
   return (
     <RigidBody type="fixed" colliders={false}>
@@ -89,6 +85,7 @@ export default function River() {
         onIntersectionEnter={() => {
           setIsSwimming(true);
           playSfx('splash');
+          unlockAchievement('firstSwim', '🏊 First swim!');
         }}
         onIntersectionExit={() => setIsSwimming(false)}
       />

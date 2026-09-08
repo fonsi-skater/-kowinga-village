@@ -63,6 +63,32 @@ export const HOBBIES_CONTENT = {
   items: ['Skating', 'Cycling', 'Meditation', 'Walks', 'Swimming'],
 };
 
+export const SKILLS_CONTENT = {
+  title: 'Skills',
+  categories: [
+    {
+      name: 'Frontend',
+      items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Three.js / React Three Fiber'],
+    },
+    {
+      name: 'Backend & Databases',
+      items: ['Node.js', 'Supabase', 'Prisma', 'PostgreSQL', 'Firebase'],
+    },
+    {
+      name: 'AI & Cloud',
+      items: ['Artificial Intelligence', 'Cloud Technologies'],
+    },
+    {
+      name: 'Also exploring',
+      items: ['Cybersecurity', 'Networking', 'Databases'],
+    },
+    {
+      name: 'Tools',
+      items: ['Git & GitHub', 'Vercel', 'PowerShell'],
+    },
+  ],
+};
+
 export const CONTACT_CONTENT = {
   title: 'Get In Touch',
   email: 'fonsialphonce@gmail.com',

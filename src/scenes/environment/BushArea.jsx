@@ -5,11 +5,14 @@
 // cultivated rows. Positions are slightly randomized for a natural feel.
 
 import { useGameStore } from '../../state/useGameStore';
-
-export const BUSH_AREA_CENTER = [-10, 0, -14];
+import { BUSH_AREA_CENTER } from '../../story/zoneData';
 
 // Fixed pseudo-random offsets (not Math.random(), so the layout is stable
-// across reloads instead of reshuffling every time the component mounts)
+// across reloads instead of reshuffling every time the component mounts).
+// Kept here (not in zoneData.js) since it's only needed for this
+// component's own relative-position render loop below — BUSH_POSITIONS
+// (the absolute version other files need) is computed once in zoneData.js
+// from this same shape of data.
 const BUSH_OFFSETS = [
   [0, 0, 0.6],
   [1.2, 0, -0.3],
@@ -20,15 +23,6 @@ const BUSH_OFFSETS = [
   [-2.0, 0, -0.6],
   [0.2, 0, -2.1],
 ];
-
-// Absolute world positions, exported so BushInteraction can check distance
-// to each bush without duplicating this offset math — same pattern as
-// Garden's PLOT_POSITIONS.
-export const BUSH_POSITIONS = BUSH_OFFSETS.map(([x, _y, z]) => [
-  BUSH_AREA_CENTER[0] + x,
-  BUSH_AREA_CENTER[1],
-  BUSH_AREA_CENTER[2] + z,
-]);
 
 function Bush({ position, scale, index }) {
   // "Tended" bushes (trimmed/cared for by Fonsi) turn a brighter, tidier

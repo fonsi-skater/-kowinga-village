@@ -7,7 +7,7 @@
 
 import { useGameStore } from '../../state/useGameStore';
 import { useInteractKey } from '../../hooks/useInteractKey';
-import { MEDITATION_SPOT_POSITION } from '../environment/MeditationSpot';
+import { MEDITATION_SPOT_POSITION } from '../../story/zoneData';
 import { playSfx } from '../../audio/sfx/playSfx';
 
 const INTERACT_RADIUS = 3;
@@ -15,6 +15,7 @@ const INTERACT_RADIUS = 3;
 export default function MeditationInteraction({ targetRef }) {
   const isMeditating = useGameStore((state) => state.isMeditating);
   const setIsMeditating = useGameStore((state) => state.setIsMeditating);
+  const unlockAchievement = useGameStore((state) => state.unlockAchievement);
 
   useInteractKey(() => {
     if (!targetRef.current) return;
@@ -25,8 +26,10 @@ export default function MeditationInteraction({ targetRef }) {
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     if (distance <= INTERACT_RADIUS) {
+      const startingToMeditate = !isMeditating;
       setIsMeditating(!isMeditating);
       playSfx('meditation-chime');
+      if (startingToMeditate) unlockAchievement('firstMeditate', '🧘 First meditation!');
     }
   });
 

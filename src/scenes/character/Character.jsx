@@ -8,7 +8,7 @@ import { useFrame } from '@react-three/fiber';
 import { RigidBody, CapsuleCollider } from '@react-three/rapier';
 import { useKeyboardControls } from '../../hooks/useKeyboardControls';
 import { useGameStore } from '../../state/useGameStore';
-import { RIVER_SURFACE_Y } from '../environment/River';
+import { RIVER_SURFACE_Y } from '../../story/zoneData';
 
 const MOVE_SPEED = 4; // units per second, on land
 const SWIM_SPEED = 2; // slower — water should feel heavier than walking

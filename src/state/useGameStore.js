@@ -111,6 +111,25 @@ export const useGameStore = create(
       activePanel: null,
       setActivePanel: (panel) => set({ activePanel: panel }),
 
+      // Tracks which individual "first time" achievements have already
+      // fired, so each only shows its toast once (first swim, first
+      // skate, etc.) — separate from the bigger one-time VillageExplorer
+      // celebration, which requires completing everything.
+      unlockedAchievements: new Set(),
+      // currentToast holds the message text currently animating in, or
+      // null. A simple single-slot (not a queue) is fine here since
+      // achievements are very unlikely to fire within the same few
+      // seconds of each other in normal play.
+      currentToast: null,
+      unlockAchievement: (key, message) => {
+        const current = get().unlockedAchievements;
+        if (current.has(key)) return; // already unlocked, don't re-fire
+        const updated = new Set(current);
+        updated.add(key);
+        set({ unlockedAchievements: updated, currentToast: message });
+        setTimeout(() => set({ currentToast: null }), 3500);
+      },
+
       tendedBushes: new Set(),
       tendBush: (index) => {
         const updated = new Set(get().tendedBushes);

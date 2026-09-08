@@ -4,8 +4,7 @@
 // progress toward tending the whole village.
 
 import { useGameStore } from '../../state/useGameStore';
-import { PLOT_POSITIONS } from '../../scenes/environment/Garden';
-import { BUSH_POSITIONS } from '../../scenes/environment/BushArea';
+import { PLOT_POSITIONS, BUSH_POSITIONS } from '../../story/zoneData';
 import { useIsTouchDevice } from '../../hooks/useIsTouchDevice';
 
 export default function ProgressTracker() {

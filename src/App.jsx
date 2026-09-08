@@ -1,34 +1,18 @@
 // App.jsx
-// Entry point for the Kowinga village 3D scene.
-// This is intentionally minimal for now: a Canvas (the 3D "window"),
-// a camera, one light, and the ground. We add the character and
-// zones one piece at a time so each step is easy to test/debug.
+// Entry point for the Kowinga village 3D scene. The heavy 3D content
+// (Scene.jsx — Three.js, Rapier physics, the water shader) is lazy-loaded
+// via React.lazy, and only starts downloading once the intro screen is
+// dismissed — keeping the very first paint fast regardless of how large
+// the 3D bundle grows.
 
-import { useRef, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Physics } from '@react-three/rapier';
+import { Loader } from '@react-three/drei';
+import { Analytics } from '@vercel/analytics/react';
 import { useGameStore } from './state/useGameStore';
 import { INTRO_NARRATION } from './story/narrationLines';
 import { useAmbientMusic } from './audio/music/useAmbientMusic';
 import { playNarrationAudio } from './audio/narration/playNarrationAudio';
-import Ground from './scenes/environment/Ground';
-import River from './scenes/environment/River';
-import SkatingPath from './scenes/environment/SkatingPath';
-import Homestead from './scenes/environment/Homestead';
-import Garden from './scenes/environment/Garden';
-import MeditationSpot from './scenes/environment/MeditationSpot';
-import BushArea from './scenes/environment/BushArea';
-import Character from './scenes/character/Character';
-import FollowCamera from './scenes/character/FollowCamera';
-import NarrationManager from './scenes/character/NarrationManager';
-import GardenInteraction from './scenes/character/GardenInteraction';
-import SpeedBoostManager from './scenes/character/SpeedBoostManager';
-import MeditationInteraction from './scenes/character/MeditationInteraction';
-import BushInteraction from './scenes/character/BushInteraction';
-import ZoneFloatingLabels from './components/ui/ZoneFloatingLabels';
-import DayNightCycle from './scenes/environment/DayNightCycle';
-import MiniMapManager from './scenes/character/MiniMapManager';
-import EasterEggManager from './scenes/character/EasterEggManager';
 import NarrationText from './components/ui/NarrationText';
 import ControlsHint from './components/ui/ControlsHint';
 import ActivityStatus from './components/ui/ActivityStatus';
@@ -44,20 +28,17 @@ import TouchInteractButton from './components/ui/TouchInteractButton';
 import MiniMap from './components/ui/MiniMap';
 import VillageExplorerCelebration from './components/ui/VillageExplorerCelebration';
 import EasterEggMessage from './components/ui/EasterEggMessage';
+import AchievementToast from './components/ui/AchievementToast';
 import { useIsTouchDevice } from './hooks/useIsTouchDevice';
+
+// Lazy-loaded: Vite/React won't include Scene.jsx (and everything it
+// imports — Three.js, Rapier, the Water shader) in the initial bundle.
+// It becomes a separate chunk, fetched only when <Scene /> is first
+// actually rendered (see the conditional render below).
+const Scene = lazy(() => import('./Scene'));
 
 function App() {
   const isTouchDevice = useIsTouchDevice();
-  // Refs for the day/night cycle to animate — created here since the
-  // lights themselves are declared in JSX below, and DayNightCycle needs
-  // direct references to update their .intensity each frame.
-  const ambientLightRef = useRef();
-  const directionalLightRef = useRef();
-  // This ref is created HERE (not inside Character) and shared with both
-  // Character (which moves the body) and FollowCamera (which reads its
-  // position) — this is the standard React pattern for "two siblings need
-  // access to the same thing": lift the shared value up to their parent.
-  const characterRef = useRef();
   const setActiveNarration = useGameStore((state) => state.setActiveNarration);
   const showIntroScreen = useGameStore((state) => state.showIntroScreen);
 
@@ -94,73 +75,26 @@ function App() {
         // any time after that would just capture a blank image.
         gl={{ preserveDrawingBuffer: true }}
       >
-        {/* Ambient light: soft light from all directions, prevents pure-black shadows */}
-        <ambientLight ref={ambientLightRef} intensity={0.6} />
-
-        {/* Directional light: acts like the sun, casts shadows */}
-        <directionalLight
-          ref={directionalLightRef}
-          position={[10, 10, 5]}
-          intensity={1}
-          castShadow
-        />
-
-        {/* Animates sky color and light intensities through a repeating
-            day/night cycle — purely atmospheric, no new 3D objects. */}
-        <DayNightCycle ambientRef={ambientLightRef} directionalRef={directionalLightRef} />
-
-        {/* Physics provider: everything that needs collision/gravity (Ground,
-            Character) must live inside this. Nothing outside it is physics-aware.
-            IMPORTANT: Physics loads its engine asynchronously (it's WASM under
-            the hood), so it must be wrapped in Suspense — without this, colliders
-            can try to build before the engine finishes loading and crash. */}
-        <Suspense fallback={null}>
-          <Physics gravity={[0, -9.81, 0]}>
-            <Ground />
-            <River />
-            <SkatingPath />
-            <Homestead />
-            <Garden />
-            <MeditationSpot />
-            <BushArea />
-            <Character bodyRef={characterRef} />
-          </Physics>
-        </Suspense>
-
-        {/* FollowCamera automatically trails Fonsi as he moves. */}
-        <FollowCamera targetRef={characterRef} />
-
-        {/* NarrationManager watches Fonsi's position and triggers narration
-            lines — it renders nothing itself, just manages state. */}
-        <NarrationManager targetRef={characterRef} />
-
-        {/* GardenInteraction listens for the E key and plants the nearest
-            garden plot if Fonsi is close enough — see the file for details. */}
-        <GardenInteraction targetRef={characterRef} />
-
-        {/* SpeedBoostManager checks if Fonsi is on the skating path ring
-            and toggles isSkating (read by Character for the speed boost). */}
-        <SpeedBoostManager targetRef={characterRef} />
-
-        {/* MeditationInteraction listens for E near the meditation platform
-            to toggle isMeditating (read by Character to freeze movement). */}
-        <MeditationInteraction targetRef={characterRef} />
-
-        {/* BushInteraction listens for E near an untended bush to tend it. */}
-        <BushInteraction targetRef={characterRef} />
-
-        {/* ZoneFloatingLabels renders each zone's name anchored to its
-            actual 3D position — appears naturally beside/above wherever
-            that zone is on screen, never competing with fixed-position
-            UI like SiteTitle. */}
-        <ZoneFloatingLabels />
-
-        {/* MiniMapManager tracks Fonsi's live position for the MiniMap UI. */}
-        <MiniMapManager targetRef={characterRef} />
-
-        {/* EasterEggManager watches for the hidden secret spot being found. */}
-        <EasterEggManager targetRef={characterRef} />
+        {/* Scene (and its whole dependency chunk) only starts loading once
+            the intro screen is gone — this is what makes the code-split
+            actually deferred, not just theoretically separate. */}
+        {!showIntroScreen && (
+          <Suspense fallback={null}>
+            <Scene />
+          </Suspense>
+        )}
       </Canvas>
+
+      {/* drei's Loader shows a progress bar (auto-tracking the loading
+          manager behind useLoader/Rapier's WASM init) while Scene's chunk
+          and assets are still loading — replaces what would otherwise be
+          a blank moment with real, professional loading feedback. */}
+      <Loader
+        containerStyles={{ background: 'rgba(10,20,12,0.9)' }}
+        innerStyles={{ width: '200px' }}
+        barStyles={{ background: '#8fd694' }}
+        dataStyles={{ color: 'white', fontFamily: 'sans-serif', fontSize: '0.85rem' }}
+      />
 
       {/* NarrationText is plain HTML, deliberately OUTSIDE the Canvas —
           it reads the same shared store that NarrationManager writes to. */}
@@ -177,6 +111,7 @@ function App() {
       <MiniMap />
       <VillageExplorerCelebration />
       <EasterEggMessage />
+      <AchievementToast />
 
       {/* Touch controls only render on touch devices — desktop users keep
           using WASD/E, so nothing changes for them. */}
@@ -186,6 +121,11 @@ function App() {
           <TouchInteractButton />
         </>
       )}
+
+      {/* Vercel's visitor analytics — renders nothing visible, just tracks
+          page views once deployed. Requires enabling Analytics in the
+          Vercel project dashboard too (free tier). */}
+      <Analytics />
     </div>
   );
 }

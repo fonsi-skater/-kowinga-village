@@ -5,8 +5,7 @@
 // physics/positioning approach stays the same either way.
 
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
-
-export const HOMESTEAD_CENTER = [0, 0, -18];
+import { HOMESTEAD_CENTER } from '../../story/zoneData';
 
 // A simple round hut: cylinder walls + cone roof
 function Hut({ position }) {
