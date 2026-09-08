@@ -5,6 +5,7 @@
 
 import { useGameStore } from '../../state/useGameStore';
 import { ABOUT_CONTENT, PROJECTS_CONTENT, CONTACT_CONTENT, SKILLS_CONTENT } from '../../story/portfolioContent';
+import { useGitHubRepos } from '../../hooks/useGitHubRepos';
 
 const overlayStyle = {
   position: 'absolute',
@@ -61,22 +62,52 @@ function AboutPanelContent() {
 }
 
 function ProjectsPanelContent() {
+  const { repos, loading, error } = useGitHubRepos();
+
+  // Fall back to the curated static list while loading, or if the live
+  // fetch fails (e.g., the unauthenticated API rate limit was hit) —
+  // this way the panel never shows an empty/broken state to a visitor.
+  const useLiveData = !loading && !error && repos && repos.length > 0;
+
   return (
     <>
       <h2 style={{ marginTop: 0 }}>{PROJECTS_CONTENT.title}</h2>
-      {PROJECTS_CONTENT.items.map((item, i) => (
-        <div key={i} style={{ marginBottom: '16px' }}>
-          <a
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: '#8fd694', fontWeight: 'bold', textDecoration: 'none' }}
-          >
-            {item.name} ↗
-          </a>
-          <p style={{ margin: '4px 0 0', opacity: 0.85, lineHeight: 1.5 }}>{item.description}</p>
-        </div>
-      ))}
+      {loading && (
+        <p style={{ opacity: 0.7, fontSize: '0.9rem' }}>Loading live repos from GitHub…</p>
+      )}
+      {useLiveData
+        ? repos.map((repo) => (
+            <div key={repo.id} style={{ marginBottom: '16px' }}>
+              <a
+                href={repo.html_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#8fd694', fontWeight: 'bold', textDecoration: 'none' }}
+              >
+                {repo.name} ↗
+              </a>
+              <p style={{ margin: '4px 0 0', opacity: 0.85, lineHeight: 1.5 }}>
+                {repo.description || 'No description provided.'}
+                {repo.language && (
+                  <span style={{ opacity: 0.6 }}> — {repo.language}</span>
+                )}
+              </p>
+            </div>
+          ))
+        : !loading &&
+          PROJECTS_CONTENT.items.map((item, i) => (
+            <div key={i} style={{ marginBottom: '16px' }}>
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#8fd694', fontWeight: 'bold', textDecoration: 'none' }}
+              >
+                {item.name} ↗
+              </a>
+              <p style={{ margin: '4px 0 0', opacity: 0.85, lineHeight: 1.5 }}>{item.description}</p>
+            </div>
+          ))}
     </>
   );
 }
